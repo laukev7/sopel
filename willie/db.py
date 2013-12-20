@@ -421,12 +421,12 @@ class Table(object):
     def _get_one(self, row, value, key):
         """Implements get() for where values is a single string"""
         if isinstance(row, basestring):
-            row = [row]
+            row_ = [row]
         db = self.db.connect()
         cur = db.cursor()
-        where = self._make_where_statement(key, row)
+        where = self._make_where_statement(key, row_)
         cur.execute(
-            'SELECT ' + value + ' FROM ' + self.name + ' WHERE ' + where, row)
+            'SELECT ' + value + ' FROM ' + self.name + ' WHERE ' + where, row_)
         result = cur.fetchone()
         if result is None:
             db.close()
@@ -438,21 +438,21 @@ class Table(object):
     def _get_many(self, row, values, key):
         """Implements get() for where values is iterable"""
         if isinstance(row, basestring):
-            row = [row]
+            row_ = [row]
         db = self.db.connect()
         cur = db.cursor()
         values = ', '.join(values)
-        where = self._make_where_statement(key, row)
+        where = self._make_where_statement(key, row_)
         cur.execute(
-            'SELECT ' + values + ' FROM ' + self.name + ' WHERE ' + where, row)
-        row = cur.fetchone()
+            'SELECT ' + values + ' FROM ' + self.name + ' WHERE ' + where, row_)
+        result = cur.fetchone()
 
-        if row is None:
+        if result is None:
             db.close()
             raise KeyError(row + ' not in database')
         db.close()
 
-        return row
+        return result
 
     def get(self, row, columns, key=None):
         """Equivalent to SELECT FROM WHERE for WillieDB.
